@@ -54,7 +54,7 @@ public class RssReader {
 
     private ArrayList<Article> articles = new ArrayList<Article>();
 
-    public RssReader(InputStream inputStream) throws ParserConfigurationException, IOException, SAXException {
+    public RssReader(InputStream inputStream) throws IOException, ParserConfigurationException {
 
         StringBuilder textBuilder = new StringBuilder();
         try (Reader reader = new BufferedReader(new InputStreamReader
@@ -68,7 +68,14 @@ public class RssReader {
         this.xmlFile = textBuilder.toString();
         this.dbFactory = DocumentBuilderFactory.newInstance();
         this.dBuilder = dbFactory.newDocumentBuilder();
-        this.document = dBuilder.parse(new ByteArrayInputStream(xmlFile.getBytes()));
+        try {
+            this.document = dBuilder.parse(new ByteArrayInputStream(xmlFile.getBytes()));
+        } catch (SAXException e) {
+            //e.printStackTrace();
+            Log.sendMessage(StatusCode.Error, "Le fichier n'est pas un Flux RSS");
+            return;
+        }
+        Log.sendMessage(StatusCode.Warning, "Xml Version: " + document.getXmlVersion());
         this.document.getDocumentElement().normalize();
 
         //Load all information in channel
@@ -85,7 +92,7 @@ public class RssReader {
                 String articleTitle = e.getElementsByTagName("title").item(0).getTextContent();
                 String articleLink = e.getElementsByTagName("link").item(0).getTextContent();
                 String articleDescription = e.getElementsByTagName("description").item(0).getTextContent();
-                this.articles.add(new Article(articleTitle, new URL(articleLink), articleDescription));
+                this.articles.add(new Article(articleTitle, articleLink, articleDescription));
                 Log.sendMessage(StatusCode.Info, articleTitle);
             }
         }
@@ -100,6 +107,20 @@ public class RssReader {
          */
         openConnection.addRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:25.0) Gecko/20100101 Firefox/25.0");
         return new RssReader(openConnection.getInputStream());
+    }
+
+    public static RssReader getRssReaderWithURL(String s) {
+        try {
+            return getRssReaderWithURL(new URL(s));
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        } catch (SAXException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     private void getChannelInformation() {
@@ -202,35 +223,6 @@ public class RssReader {
 
     public ArrayList<Article> getArticles() {
         return this.articles;
-    }
-
-    public class Article {
-
-        private String title;
-        private URL link;
-        private String description;
-
-        public Article(String title, URL url, String description) {
-            this.title = title;
-            this.link = link;
-            this.description = description;
-        }
-
-        public String getName() {
-            return this.title;
-        }
-
-        public URL getLink() {
-            return this.link;
-        }
-
-        public String getDescription() {
-            return this.description;
-        }
-
-        public String toString() {
-            return getName();
-        }
     }
 
 }
