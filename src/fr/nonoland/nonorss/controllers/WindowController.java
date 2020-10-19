@@ -32,6 +32,9 @@ public class WindowController {
     @FXML
     private TabPane tabPane;
 
+    @FXML
+    private MenuItem rssManagementButton;
+
     private Main main;
     //private Object MouseEvent;
 
@@ -60,8 +63,11 @@ public class WindowController {
 
                     newTab.setContent(articleView);
 
+                    tabPane.getSelectionModel().select(newTab);
+
                     tabPane.getTabs().add(newTab);
 
+                    main.localSave.addURLInHistory(articleTreeItem.getArticle());
 
                 }
             }
@@ -77,7 +83,16 @@ public class WindowController {
     @FXML
     private void handleNewRSS() {
         try {
-            main.showNewRSSWindows();
+            main.showNewRSSWindows(main.primaryStage);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void handleRSSManagement() {
+        try {
+            main.showRssManagementWindow();
         } catch (IOException e) {
             e.printStackTrace();
         }

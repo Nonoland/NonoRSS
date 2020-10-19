@@ -21,13 +21,9 @@
           <Menu mnemonicParsing="false" text="Fichier">
             <items>
               <MenuItem fx:id="buttonNewRSS" mnemonicParsing="false" onAction="#handleNewRSS" text="Nouveau RSS" />
+                  <MenuItem fx:id="rssManagementButton" mnemonicParsing="false" onAction="#handleRSSManagement" text="Gestion flux RSS" />
                   <SeparatorMenuItem mnemonicParsing="false" />
                   <MenuItem mnemonicParsing="false" onAction="#exitButton" text="Fermer" />
-            </items>
-          </Menu>
-          <Menu mnemonicParsing="false" text="Edit">
-            <items>
-              <MenuItem mnemonicParsing="false" text="Delete" />
             </items>
           </Menu>
           <Menu mnemonicParsing="false" text="Help">

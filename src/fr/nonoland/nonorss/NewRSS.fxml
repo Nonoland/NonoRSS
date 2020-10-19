@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Text?>
+
+<VBox fx:id="mainVbox" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="70.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fr.nonoland.nonorss.controllers.NewRSSController">
+   <children>
+      <Text fx:id="labelUrl" strokeType="OUTSIDE" strokeWidth="0.0" text="URL du Flux RSS" textAlignment="CENTER" VBox.vgrow="ALWAYS" />
+      <TextField fx:id="textFieldUrl" />
+      <Button fx:id="buttonSave" mnemonicParsing="false" onAction="#handleButtonSave" text="Enregistrer" VBox.vgrow="ALWAYS" />
+   </children>
+</VBox>

@@ -14,7 +14,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
@@ -71,7 +70,6 @@ public class RssReader {
         try {
             this.document = dBuilder.parse(new ByteArrayInputStream(xmlFile.getBytes()));
         } catch (SAXException e) {
-            //e.printStackTrace();
             Log.sendMessage(StatusCode.Error, "Le fichier n'est pas un Flux RSS");
             return;
         }
@@ -213,8 +211,8 @@ public class RssReader {
         return this.description;
     }
 
-    public URL getLink() throws MalformedURLException {
-        return new URL(this.link);
+    public String getLink() {
+        return this.link;
     }
 
     public String getLanguage() {
@@ -223,6 +221,14 @@ public class RssReader {
 
     public ArrayList<Article> getArticles() {
         return this.articles;
+    }
+
+    public void setLink(String link) {
+        this.link = link;
+    }
+
+    public String toString() {
+        return this.title;
     }
 
 }

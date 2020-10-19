@@ -1,6 +1,7 @@
 package fr.nonoland.nonorss;
 
 import fr.nonoland.nonorss.controllers.NewRSSController;
+import fr.nonoland.nonorss.controllers.RSSManagementController;
 import fr.nonoland.nonorss.controllers.WindowController;
 import fr.nonoland.nonorss.utils.LocalSave;
 import fr.nonoland.nonorss.utils.RssReader;
@@ -12,24 +13,28 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 
 public class Main extends Application {
 
-    public LocalSave localSave;
+    /*
+    TODO Téléchargement des flux rss asynchrone pour éviter l'attente du chargement de l'application
+    TODO Ajout de l'article déjà lu (Juste changer le style)
+     */
 
-    //public RssReader rssReader;
+    public LocalSave localSave;
 
     public ArrayList<RssReader> fluxRss = new ArrayList<RssReader>();
 
     /* Controllers */
     private WindowController windowController;
     private NewRSSController newRSSController;
+    private RSSManagementController rssManagementController;
 
     public Stage stageNewRSS;
+    public Stage stageRSSManagement;
 
-    private Stage primaryStage;
+    public Stage primaryStage;
     @Override
     public void start(Stage primaryStage) throws Exception {
         this.primaryStage = primaryStage;
@@ -38,14 +43,10 @@ public class Main extends Application {
 
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(getClass().getResource("Window.fxml"));
-        //Parent root = FXMLLoader.load(getClass().getResource("Window.fxml"));
         Parent root = loader.load();
         primaryStage.setTitle("NonoRSS");
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
-
-        URL feedSource = new URL("https://korben.info/feed");
-        //this.rssReader = RssReader.getRssReaderWithURL(feedSource);
 
         windowController = loader.getController();
         windowController.setMain(this);
@@ -53,7 +54,7 @@ public class Main extends Application {
         windowController.updateRSS();
     }
 
-    public void showNewRSSWindows() throws IOException {
+    public void showNewRSSWindows(Stage stageOwner) throws IOException {
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(getClass().getResource("NewRSS.fxml"));
         Parent root = loader.load();
@@ -61,7 +62,7 @@ public class Main extends Application {
         stageNewRSS = new Stage();
         stageNewRSS.setTitle("Nouveau Flux RSS");
         stageNewRSS.initModality(Modality.WINDOW_MODAL);
-        stageNewRSS.initOwner(primaryStage);
+        stageNewRSS.initOwner(stageOwner);
         Scene scene = new Scene(root);
         stageNewRSS.setScene(scene);
 
@@ -71,13 +72,28 @@ public class Main extends Application {
         stageNewRSS.showAndWait();
     }
 
+    public void showRssManagementWindow() throws IOException {
+        FXMLLoader loader = new FXMLLoader();
+        loader.setLocation(getClass().getResource("RSSManagement.fxml"));
+        Parent root = loader.load();
+
+        stageRSSManagement = new Stage();
+        stageRSSManagement.setTitle("Gestion des flux RSS");
+        stageRSSManagement.initModality(Modality.WINDOW_MODAL);
+        stageRSSManagement.initOwner(primaryStage);
+        Scene scene = new Scene(root);
+        stageRSSManagement.setScene(scene);
+
+        rssManagementController = loader.getController();
+        rssManagementController.setMain(this);
+        rssManagementController.updateListView();
+
+        stageRSSManagement.showAndWait();
+    }
+
     public ArrayList<RssReader> getFluxRss() {
         return this.fluxRss;
     }
-
-    /*public RssReader getRssReader() {
-        return this.rssReader;
-    }*/
 
     public static void main(String[] args) {
         launch(args);

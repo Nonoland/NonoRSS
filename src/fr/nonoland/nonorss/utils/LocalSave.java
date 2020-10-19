@@ -7,10 +7,13 @@ import fr.nonoland.nonorss.utils.log.StatusCode;
 import javax.print.DocFlavor;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigInteger;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -20,6 +23,7 @@ public class LocalSave {
 
     private String separator;
     private Path pathProperties;
+    private Path pathHistoryFile;
 
     private Properties properties;
 
@@ -32,12 +36,22 @@ public class LocalSave {
         this.separator = System.getProperty("file.separator");
         this.pathProperties = Paths.get(System.getProperty("user.home"), ".nonorss", "nonorss.properties");
 
+        this.pathHistoryFile = Paths.get(System.getProperty("user.home"), ".nonorss", "history", "test.hist");
+
         //Vérifie si le dossier a déjà créer
         if(!Files.exists(pathProperties.getParent())) {
             Log.sendMessage(StatusCode.Warning, "Le dossier n'exite pas ! Création du dossier !");
             Files.createDirectory(pathProperties.getParent());
             if(!Files.exists(pathProperties))
                 Files.createFile(pathProperties);
+        }
+
+        //Vérifie si le dossier "history" existe
+        if(!Files.exists(pathHistoryFile.getParent())) {
+            Log.sendMessage(StatusCode.Warning, "Le dossier n'existe pas ! Création du dossier !");
+            Files.createDirectory(pathHistoryFile.getParent());
+            if(!Files.exists(pathHistoryFile))
+                Files.createFile(pathHistoryFile);
         }
 
         //Chargement du fichier properties
@@ -71,5 +85,41 @@ public class LocalSave {
     public void saveProperties() throws IOException {
         properties.setProperty("fluxrss", String.join("|", rss));
         properties.store(Files.newOutputStream(pathProperties), null);
+    }
+
+    public void addURLInHistory(Article article) {
+
+        /* Create File */
+        Path path = Paths.get(System.getProperty("user.home"), ".nonorss", "history", hash(article.getLink()) + ".hist");
+
+        try {
+            Files.createFile(path);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public boolean ifArticleAlreadySeen(Article article) {
+        Path path = Paths.get(System.getProperty("user.home"), ".nonorss", "history", hash(article.getLink()) + ".hist");
+
+        return Files.exists(path);
+    }
+
+    private String hash(String m) {
+        MessageDigest md = null;
+        try {
+            md = MessageDigest.getInstance("MD5");
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        byte[] messageDigest = md.digest(m.getBytes());
+        BigInteger no = new BigInteger(1, messageDigest);
+        String hashtext = no.toString(16);
+        while(hashtext.length() < 32) {
+            hashtext = "0" + hashtext;
+        }
+
+        return hashtext;
     }
 }
