@@ -18,23 +18,23 @@ import java.util.ArrayList;
 public class Main extends Application {
 
     /*
-    TODO Téléchargement des flux rss asynchrone pour éviter l'attente du chargement de l'application
     TODO Ajout de l'article déjà lu (Juste changer le style)
      */
 
-    public LocalSave localSave;
+    private LocalSave localSave;
 
-    public ArrayList<RssReader> fluxRss = new ArrayList<RssReader>();
+    private ArrayList<RssReader> fluxRss = new ArrayList<RssReader>();
 
     /* Controllers */
-    private WindowController windowController;
-    private NewRSSController newRSSController;
-    private RSSManagementController rssManagementController;
+    public WindowController ControllerWindow;
+    public NewRSSController ControllerNewRSS;
+    public RSSManagementController ControllerRSSManagement;
 
     public Stage stageNewRSS;
     public Stage stageRSSManagement;
 
     public Stage primaryStage;
+
     @Override
     public void start(Stage primaryStage) throws Exception {
         this.primaryStage = primaryStage;
@@ -48,13 +48,16 @@ public class Main extends Application {
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
 
-        windowController = loader.getController();
-        windowController.setMain(this);
+        ControllerWindow = loader.getController();
+        ControllerWindow.setMain(this);
 
-        windowController.updateRSS();
+        ControllerWindow.updateRSS();
     }
 
-    public void showNewRSSWindows(Stage stageOwner) throws IOException {
+    /*
+    Affiche une fenetre modal: NewRSS.fxml
+     */
+    public void showWindowNewRSS(Stage stageOwner) throws IOException {
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(getClass().getResource("NewRSS.fxml"));
         Parent root = loader.load();
@@ -66,13 +69,16 @@ public class Main extends Application {
         Scene scene = new Scene(root);
         stageNewRSS.setScene(scene);
 
-        newRSSController = loader.getController();
-        newRSSController.setMain(this);
+        ControllerNewRSS = loader.getController();
+        ControllerNewRSS.setMain(this);
 
         stageNewRSS.showAndWait();
     }
 
-    public void showRssManagementWindow() throws IOException {
+    /*
+    Affiche une fenetre modal: RSSManagement.fxml
+     */
+    public void showWindowRssManagement(Stage stageOwner) throws IOException {
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(getClass().getResource("RSSManagement.fxml"));
         Parent root = loader.load();
@@ -80,20 +86,28 @@ public class Main extends Application {
         stageRSSManagement = new Stage();
         stageRSSManagement.setTitle("Gestion des flux RSS");
         stageRSSManagement.initModality(Modality.WINDOW_MODAL);
-        stageRSSManagement.initOwner(primaryStage);
+        stageRSSManagement.initOwner(stageOwner);
         Scene scene = new Scene(root);
         stageRSSManagement.setScene(scene);
 
-        rssManagementController = loader.getController();
-        rssManagementController.setMain(this);
-        rssManagementController.updateListView();
+        ControllerRSSManagement = loader.getController();
+        ControllerRSSManagement.setMain(this);
+        ControllerRSSManagement.updateListView();
 
         stageRSSManagement.showAndWait();
     }
 
+    /* Getter Setter */
+
     public ArrayList<RssReader> getFluxRss() {
         return this.fluxRss;
     }
+
+    public LocalSave getLocalSave() {
+        return this.localSave;
+    }
+
+    /* Main function */
 
     public static void main(String[] args) {
         launch(args);

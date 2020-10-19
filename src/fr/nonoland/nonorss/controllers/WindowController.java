@@ -15,6 +15,7 @@ import javafx.scene.web.WebView;
 import java.io.IOException;
 
 public class WindowController {
+
     @FXML
     private TreeView<String> articleTreeView;
 
@@ -35,12 +36,10 @@ public class WindowController {
     @FXML
     private MenuItem rssManagementButton;
 
+    @FXML
+    private ProgressBar progressBarUpateRss;
+
     private Main main;
-    //private Object MouseEvent;
-
-    public WindowController() {
-
-    }
 
     @FXML
     private void initialize() {
@@ -67,7 +66,7 @@ public class WindowController {
 
                     tabPane.getTabs().add(newTab);
 
-                    main.localSave.addURLInHistory(articleTreeItem.getArticle());
+                    main.getLocalSave().addURLInHistory(articleTreeItem.getArticle());
 
                 }
             }
@@ -83,7 +82,7 @@ public class WindowController {
     @FXML
     private void handleNewRSS() {
         try {
-            main.showNewRSSWindows(main.primaryStage);
+            main.showWindowNewRSS(main.primaryStage);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -92,7 +91,7 @@ public class WindowController {
     @FXML
     private void handleRSSManagement() {
         try {
-            main.showRssManagementWindow();
+            main.showWindowRssManagement(main.primaryStage);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -109,7 +108,10 @@ public class WindowController {
 
         TreeItem rootItem = new TreeItem("FluxRSS");
 
-        for(RssReader rss : main.fluxRss) {
+        for(RssReader rss : main.getFluxRss()) {
+
+            rss.readXML();
+
             TreeItem flux = new TreeItem(rss.getTitle());
 
             for(Article article : rss.getArticles()) {
@@ -123,6 +125,19 @@ public class WindowController {
 
         articleTreeView.setRoot(rootItem);
         articleTreeView.setShowRoot(false);
+    }
+
+    public void updateProgressBar() {
+        int rssReaderReady = 0;
+        for(RssReader rss : main.getFluxRss()) {
+            if(rss.isDownloadGood())
+                rssReaderReady++;
+        }
+
+        progressBarUpateRss.setProgress(rssReaderReady / main.getFluxRss().size());
+
+        if(progressBarUpateRss.getProgress() == 1)
+            updateRSS();
     }
 
 }

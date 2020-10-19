@@ -17,7 +17,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 public class NewRSSController {
-    private Main main;
 
     @FXML
     private VBox mainVbox;
@@ -27,6 +26,8 @@ public class NewRSSController {
     private TextField textFieldUrl;
     @FXML
     private Button buttonSave;
+
+    private Main main;
 
     @FXML
     private void initialize() {
@@ -38,11 +39,13 @@ public class NewRSSController {
         Log.sendMessage(StatusCode.Info, "Enregistrement d'un nouveau flux RSS: " + textFieldUrl.getText());
 
         /* Création de l'objet RssReader */
-        RssReader newRss = RssReader.getRssReaderWithURL(new URL(textFieldUrl.getText()));
+        //RssReader newRss = RssReader.getRssReaderWithURL(new URL(textFieldUrl.getText()));
+        RssReader newRss = new RssReader((textFieldUrl.getText()));
+        newRss.readXML();
         //Ajout dans la liste des flux RSS
-        main.fluxRss.add(newRss);
+        main.getFluxRss().add(newRss);
         //Ajout dans les fichiers properties
-        main.localSave.addRSS(textFieldUrl.getText());
+        main.getLocalSave().addRSS(textFieldUrl.getText());
 
         if(newRss != null)
             main.stageNewRSS.close();

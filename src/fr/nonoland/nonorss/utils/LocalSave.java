@@ -5,6 +5,7 @@ import fr.nonoland.nonorss.utils.log.Log;
 import fr.nonoland.nonorss.utils.log.StatusCode;
 
 import javax.print.DocFlavor;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
@@ -21,7 +22,6 @@ import java.util.Properties;
 
 public class LocalSave {
 
-    private String separator;
     private Path pathProperties;
     private Path pathHistoryFile;
 
@@ -30,10 +30,9 @@ public class LocalSave {
     private ArrayList<String> rss;
 
     private Main main;
-    public LocalSave(Main main) throws IOException {
+    public LocalSave(Main main) throws IOException, ParserConfigurationException {
         this.main = main;
 
-        this.separator = System.getProperty("file.separator");
         this.pathProperties = Paths.get(System.getProperty("user.home"), ".nonorss", "nonorss.properties");
 
         this.pathHistoryFile = Paths.get(System.getProperty("user.home"), ".nonorss", "history", "test.hist");
@@ -67,8 +66,11 @@ public class LocalSave {
             rss = new ArrayList<String>();
 
         for(String s : rss) {
-            RssReader rss = RssReader.getRssReaderWithURL(s);
-            main.fluxRss.add(rss);
+            //RssReader rss = RssReader.getRssReaderWithURL(s);
+            RssReader rss = new RssReader(s);
+            rss.setMain(main);
+            rss.readXML();
+            main.getFluxRss().add(rss);
         }
 
     }

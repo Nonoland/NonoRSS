@@ -2,7 +2,6 @@ package fr.nonoland.nonorss.controllers;
 
 import fr.nonoland.nonorss.Main;
 import fr.nonoland.nonorss.utils.RssReader;
-import fr.nonoland.nonorss.utils.log.Log;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -66,7 +65,7 @@ public class RSSManagementController {
 
     public void handleAdd() {
         try {
-            main.showNewRSSWindows(main.stageRSSManagement);
+            main.showWindowNewRSS(main.stageRSSManagement);
         } catch (IOException e) {
             e.printStackTrace();
         }

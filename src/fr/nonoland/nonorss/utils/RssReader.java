@@ -1,8 +1,10 @@
 package fr.nonoland.nonorss.utils;
 
-import com.sun.jndi.toolkit.url.UrlUtil;
+import fr.nonoland.nonorss.Main;
 import fr.nonoland.nonorss.utils.log.Log;
 import fr.nonoland.nonorss.utils.log.StatusCode;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.scene.image.Image;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -14,6 +16,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
@@ -22,6 +25,8 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public class RssReader {
+
+    private String urlRssReader;
 
     /* XML File */
     private String xmlFile;
@@ -53,72 +58,65 @@ public class RssReader {
 
     private ArrayList<Article> articles = new ArrayList<Article>();
 
-    public RssReader(InputStream inputStream) throws IOException, ParserConfigurationException {
+    /* Thread */
+    private Thread threadDownloadRss;
+    private boolean downloadGood = false;
 
-        StringBuilder textBuilder = new StringBuilder();
-        try (Reader reader = new BufferedReader(new InputStreamReader
-                (inputStream, Charset.forName(StandardCharsets.UTF_8.name())))) {
-            int c = 0;
-            while ((c = reader.read()) != -1) {
-                textBuilder.append((char) c);
-            }
-        }
+    /* Main */
+    private Main main;
 
-        this.xmlFile = textBuilder.toString();
-        this.dbFactory = DocumentBuilderFactory.newInstance();
-        this.dBuilder = dbFactory.newDocumentBuilder();
-        try {
-            this.document = dBuilder.parse(new ByteArrayInputStream(xmlFile.getBytes()));
-        } catch (SAXException e) {
-            Log.sendMessage(StatusCode.Error, "Le fichier n'est pas un Flux RSS");
-            return;
-        }
-        Log.sendMessage(StatusCode.Warning, "Xml Version: " + document.getXmlVersion());
-        this.document.getDocumentElement().normalize();
+    public RssReader(String urlRssReader) throws IOException, ParserConfigurationException {
+        this.urlRssReader = urlRssReader;
 
-        //Load all information in channel
-        getChannelInformation();
+        threadDownloadRss = new Thread(new ThreadDownloadRss());
+        threadDownloadRss.setDaemon(true);
+        threadDownloadRss.start();
 
-        Log.sendMessage(StatusCode.Info, "Chargement des articles du site: " + title + " | " + link);
-
-        /* Item list */
-        NodeList itemList = document.getElementsByTagName("item");
-        for(int i = 0; i < itemList.getLength(); i++) {
-            Node articleNode = itemList.item(i);
-            if(articleNode.getNodeType() == Node.ELEMENT_NODE) {
-                Element e = (Element) articleNode;
-                String articleTitle = e.getElementsByTagName("title").item(0).getTextContent();
-                String articleLink = e.getElementsByTagName("link").item(0).getTextContent();
-                String articleDescription = e.getElementsByTagName("description").item(0).getTextContent();
-                this.articles.add(new Article(articleTitle, articleLink, articleDescription));
-                Log.sendMessage(StatusCode.Info, articleTitle);
-            }
-        }
-
-        Log.sendMessage(StatusCode.Info, "Nombres d'articles trouvés: " + articles.size());
     }
 
-    public static RssReader getRssReaderWithURL(URL url) throws IOException, ParserConfigurationException, SAXException {
-        URLConnection openConnection = url.openConnection();
-        /*
-        Ajout de l'user-agent pour éviter l'erreur 403
-         */
-        openConnection.addRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:25.0) Gecko/20100101 Firefox/25.0");
-        return new RssReader(openConnection.getInputStream());
-    }
+    public void readXML() {
+        if(downloadGood) {
 
-    public static RssReader getRssReaderWithURL(String s) {
-        try {
-            return getRssReaderWithURL(new URL(s));
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
-        } catch (SAXException e) {
-            e.printStackTrace();
+            this.dbFactory = DocumentBuilderFactory.newInstance();
+            try {
+                this.dBuilder = dbFactory.newDocumentBuilder();
+            } catch (ParserConfigurationException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                this.document = dBuilder.parse(new ByteArrayInputStream(xmlFile.getBytes()));
+            } catch (SAXException e) {
+                Log.sendMessage(StatusCode.Error, "Le fichier n'est pas un Flux RSS !");
+                e.printStackTrace();
+            } catch (IOException e) {
+                Log.sendMessage(StatusCode.Error, "Erreur pendant la lecture du ficher !");
+                e.printStackTrace();
+            }
+            Log.sendMessage(StatusCode.Warning, "Xml Version: " + document.getXmlVersion());
+            this.document.getDocumentElement().normalize();
+
+            //Load all information in channel
+            getChannelInformation();
+
+            Log.sendMessage(StatusCode.Info, "Chargement des articles du site: " + title + " | " + link);
+
+            /* Item list */
+            NodeList itemList = document.getElementsByTagName("item");
+            for (int i = 0; i < itemList.getLength(); i++) {
+                Node articleNode = itemList.item(i);
+                if (articleNode.getNodeType() == Node.ELEMENT_NODE) {
+                    Element e = (Element) articleNode;
+                    String articleTitle = e.getElementsByTagName("title").item(0).getTextContent();
+                    String articleLink = e.getElementsByTagName("link").item(0).getTextContent();
+                    String articleDescription = e.getElementsByTagName("description").item(0).getTextContent();
+                    this.articles.add(new Article(articleTitle, articleLink, articleDescription));
+                    Log.sendMessage(StatusCode.Info, articleTitle);
+                }
+            }
+
+            Log.sendMessage(StatusCode.Info, "Nombres d'articles trouvés: " + articles.size());
         }
-
-        return null;
     }
 
     private void getChannelInformation() {
@@ -229,6 +227,75 @@ public class RssReader {
 
     public String toString() {
         return this.title;
+    }
+
+    public boolean isDownloadGood() {
+        return this.downloadGood;
+    }
+
+    public void setMain(Main main) {
+        this.main = main;
+    }
+
+    private class ThreadDownloadRss implements Runnable {
+
+        @Override
+        public void run() {
+
+                    Log.sendMessage("Lancement du téléchargement ! " + urlRssReader);
+
+                    URL url = null;
+                    try {
+                        url = new URL(urlRssReader);
+                    } catch (MalformedURLException e) {
+                        e.printStackTrace();
+                    }
+
+                    URLConnection openConnection = null;
+                    try {
+                        openConnection = url.openConnection();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    /*
+                    Ajout de l'user-agent pour éviter l'erreur 403
+                    */
+                    openConnection.addRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:25.0) Gecko/20100101 Firefox/25.0");
+
+                    InputStream inputStream = null;
+                    try {
+                        inputStream = openConnection.getInputStream();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    StringBuilder textBuilder = new StringBuilder();
+                    try (Reader reader = new BufferedReader(new InputStreamReader(inputStream, Charset.forName(StandardCharsets.UTF_8.name())))) {
+                        int c = 0;
+                        while ((c = reader.read()) != -1) {
+                            textBuilder.append((char) c);
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    xmlFile = textBuilder.toString();
+                    downloadGood = true;
+
+                    if(main != null) {
+                        Runnable updater = new Runnable() {
+                            @Override
+                            public void run() {
+                                main.ControllerWindow.updateProgressBar();
+                            }
+                        };
+
+                        Platform.runLater(updater);
+
+                    }
+
+        }
+
     }
 
 }
