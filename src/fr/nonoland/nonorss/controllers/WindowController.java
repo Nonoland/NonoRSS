@@ -4,8 +4,7 @@ import fr.nonoland.nonorss.Main;
 import fr.nonoland.nonorss.fx.ArticleTreeItem;
 import fr.nonoland.nonorss.utils.Article;
 import fr.nonoland.nonorss.utils.RssReader;
-import fr.nonoland.nonorss.utils.log.Log;
-import fr.nonoland.nonorss.utils.log.StatusCode;
+import fr.nonoland.nonoutils.logs.Logs;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -109,7 +108,7 @@ public class WindowController {
 
     @FXML
     public void updateRSS() {
-        Log.sendMessage(StatusCode.Warning, "Mise à jour de la liste des flux...");
+        Logs.sendWarning("Mise à jour de la liste des flux...");
 
         TreeItem rootItem = new TreeItem("FluxRSS");
 
