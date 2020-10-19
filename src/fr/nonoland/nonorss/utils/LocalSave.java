@@ -1,15 +1,12 @@
 package fr.nonoland.nonorss.utils;
 
 import fr.nonoland.nonorss.Main;
-import fr.nonoland.nonorss.utils.log.Log;
-import fr.nonoland.nonorss.utils.log.StatusCode;
+import fr.nonoland.nonoutils.logs.Logs;
 
-import javax.print.DocFlavor;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -17,7 +14,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Properties;
 
 public class LocalSave {
@@ -39,7 +35,7 @@ public class LocalSave {
 
         //Vérifie si le dossier a déjà créer
         if(!Files.exists(pathProperties.getParent())) {
-            Log.sendMessage(StatusCode.Warning, "Le dossier n'exite pas ! Création du dossier !");
+            Logs.sendWarning("Le dossier n'exite pas ! Création du dossier !");
             Files.createDirectory(pathProperties.getParent());
             if(!Files.exists(pathProperties))
                 Files.createFile(pathProperties);
@@ -47,7 +43,7 @@ public class LocalSave {
 
         //Vérifie si le dossier "history" existe
         if(!Files.exists(pathHistoryFile.getParent())) {
-            Log.sendMessage(StatusCode.Warning, "Le dossier n'existe pas ! Création du dossier !");
+            Logs.sendWarning("Le dossier n'existe pas ! Création du dossier !");
             Files.createDirectory(pathHistoryFile.getParent());
             if(!Files.exists(pathHistoryFile))
                 Files.createFile(pathHistoryFile);

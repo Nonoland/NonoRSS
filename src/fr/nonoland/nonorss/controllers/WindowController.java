@@ -1,6 +1,5 @@
 package fr.nonoland.nonorss.controllers;
 
-import com.sun.deploy.util.StringUtils;
 import fr.nonoland.nonorss.Main;
 import fr.nonoland.nonorss.fx.ArticleTreeItem;
 import fr.nonoland.nonorss.utils.Article;

@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="NonoUtils">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../NonoUtils/out/artifacts/NonoUtils/NonoUtils.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

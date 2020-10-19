@@ -1,7 +1,6 @@
 package fr.nonoland.nonorss.controllers;
 
 import fr.nonoland.nonorss.Main;
-import fr.nonoland.nonorss.utils.RssReader;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;

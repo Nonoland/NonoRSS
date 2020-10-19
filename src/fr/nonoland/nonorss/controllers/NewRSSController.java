@@ -2,8 +2,7 @@ package fr.nonoland.nonorss.controllers;
 
 import fr.nonoland.nonorss.Main;
 import fr.nonoland.nonorss.utils.RssReader;
-import fr.nonoland.nonorss.utils.log.Log;
-import fr.nonoland.nonorss.utils.log.StatusCode;
+import fr.nonoland.nonoutils.logs.Logs;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
@@ -13,8 +12,6 @@ import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 public class NewRSSController {
 
@@ -36,7 +33,7 @@ public class NewRSSController {
 
     @FXML
     private void handleButtonSave() throws IOException, SAXException, ParserConfigurationException {
-        Log.sendMessage(StatusCode.Info, "Enregistrement d'un nouveau flux RSS: " + textFieldUrl.getText());
+        Logs.sendInfo("Enregistrement d'un nouveau flux RSS: " + textFieldUrl.getText());
 
         /* Création de l'objet RssReader */
         //RssReader newRss = RssReader.getRssReaderWithURL(new URL(textFieldUrl.getText()));

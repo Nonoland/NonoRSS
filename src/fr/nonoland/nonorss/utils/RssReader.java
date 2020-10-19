@@ -1,8 +1,7 @@
 package fr.nonoland.nonorss.utils;
 
 import fr.nonoland.nonorss.Main;
-import fr.nonoland.nonorss.utils.log.Log;
-import fr.nonoland.nonorss.utils.log.StatusCode;
+import fr.nonoland.nonoutils.logs.Logs;
 import javafx.application.Platform;
 import javafx.scene.image.Image;
 import org.w3c.dom.Document;
@@ -85,19 +84,19 @@ public class RssReader {
             try {
                 this.document = dBuilder.parse(new ByteArrayInputStream(xmlFile.getBytes()));
             } catch (SAXException e) {
-                Log.sendMessage(StatusCode.Error, "Le fichier n'est pas un Flux RSS !");
+                Logs.sendError("Le fichier n'est pas un Flux RSS !");
                 e.printStackTrace();
             } catch (IOException e) {
-                Log.sendMessage(StatusCode.Error, "Erreur pendant la lecture du ficher !");
+                Logs.sendError( "Erreur pendant la lecture du ficher !");
                 e.printStackTrace();
             }
-            Log.sendMessage(StatusCode.Warning, "Xml Version: " + document.getXmlVersion());
+            Logs.sendWarning("Xml Version: " + document.getXmlVersion());
             this.document.getDocumentElement().normalize();
 
             //Load all information in channel
             getChannelInformation();
 
-            Log.sendMessage(StatusCode.Info, "Chargement des articles du site: " + title + " | " + link);
+           Logs.sendInfo("Chargement des articles du site: " + title + " | " + link);
 
             /* Item list */
             NodeList itemList = document.getElementsByTagName("item");
@@ -109,11 +108,11 @@ public class RssReader {
                     String articleLink = e.getElementsByTagName("link").item(0).getTextContent();
                     String articleDescription = e.getElementsByTagName("description").item(0).getTextContent();
                     this.articles.add(new Article(articleTitle, articleLink, articleDescription));
-                    Log.sendMessage(StatusCode.Info, articleTitle);
+                    Logs.sendInfo(articleTitle);
                 }
             }
 
-            Log.sendMessage(StatusCode.Info, "Nombres d'articles trouvés: " + articles.size());
+            Logs.sendInfo( "Nombres d'articles trouvés: " + articles.size());
         }
     }
 
@@ -129,7 +128,7 @@ public class RssReader {
                 this.link = channel.getElementsByTagName("link").item(0).getTextContent();
                 this.description = channel.getElementsByTagName("description").item(0).getTextContent();
             } else {
-                Log.sendMessage(StatusCode.Error, "Les informations obligatoires ne sont pas complètes !");
+                Logs.sendError("Les informations obligatoires ne sont pas complètes !");
                 return;
             }
 
@@ -137,60 +136,60 @@ public class RssReader {
             if(channel.getElementsByTagName("language").getLength() != 0)
                 this.language = channel.getElementsByTagName("language").item(0).getTextContent();
             else
-                Log.sendMessage(StatusCode.Warning, "La langue n'est pas disponible.");
+                Logs.sendWarning("La langue n'est pas disponible.");
 
             if(channel.getElementsByTagName("copyright").getLength() != 0)
                 this.copyright = channel.getElementsByTagName("copyright").item(0).getTextContent();
             else
-                Log.sendMessage(StatusCode.Warning, "Le copyright n'est pas disponible.");
+                Logs.sendWarning("Le copyright n'est pas disponible.");
 
             if(channel.getElementsByTagName("managingEditor").getLength() != 0)
                 this.managingEditor = channel.getElementsByTagName("managingEditor").item(0).getTextContent();
             else
-                Log.sendMessage(StatusCode.Warning, "L'email managingEditor n'est pas disponible.");
+                Logs.sendWarning("L'email managingEditor n'est pas disponible.");
 
             if(channel.getElementsByTagName("webMaster").getLength() != 0)
                 this.webMaster = channel.getElementsByTagName("webMaster").item(0).getTextContent();
             else
-                Log.sendMessage(StatusCode.Warning, "L'email du webMaster n'est pas disponible.");
+                Logs.sendWarning("L'email du webMaster n'est pas disponible.");
 
             //TODO Add var with Date later
             if(channel.getElementsByTagName("category").getLength() != 0)
                 this.category = channel.getElementsByTagName("category").item(0).getTextContent();
             else
-                Log.sendMessage(StatusCode.Warning, "La categorie n'est pas disponible.");
+                Logs.sendWarning("La categorie n'est pas disponible.");
 
             if(channel.getElementsByTagName("generator").getLength() != 0)
                 this.generator = channel.getElementsByTagName("generator").item(0).getTextContent();
             else
-                Log.sendMessage(StatusCode.Warning, "Le générateur n'est pas disponible.");
+                Logs.sendWarning("Le générateur n'est pas disponible.");
 
             if(channel.getElementsByTagName("docs").getLength() != 0)
                 this.docs = channel.getElementsByTagName("docs").item(0).getTextContent();
             else
-                Log.sendMessage(StatusCode.Warning, "Le docs n'est pas disponible.");
+                Logs.sendWarning("Le docs n'est pas disponible.");
 
             if(channel.getElementsByTagName("cloud").getLength() != 0)
                 this.cloud = channel.getElementsByTagName("cloud").item(0).getTextContent();
             else
-                Log.sendMessage(StatusCode.Warning, "Le cloud n'est pas disponible.");
+                Logs.sendWarning("Le cloud n'est pas disponible.");
 
             if(channel.getElementsByTagName("ttl").getLength() != 0)
                 this.ttl = Integer.parseInt(channel.getElementsByTagName("ttl").item(0).getTextContent());
             else
-                Log.sendMessage(StatusCode.Warning, "Le ttl n'est pas disponible.");
+                Logs.sendWarning("Le ttl n'est pas disponible.");
 
             //TODO Add image later
 
             if(channel.getElementsByTagName("textInput").getLength() != 0)
                 this.textInput = channel.getElementsByTagName("textInput").item(0).getTextContent();
             else
-                Log.sendMessage(StatusCode.Warning, "Le textInput n'est pas disponible.");
+                Logs.sendWarning("Le textInput n'est pas disponible.");
 
             //TODO Add skipHours and Days later
 
         } else {
-            Log.sendMessage(StatusCode.Error, "Aucun élément <channel> dans le flux RSS.");
+            Logs.sendError("Aucun élément <channel> dans le flux RSS.");
             return;
         }
     }
@@ -240,7 +239,7 @@ public class RssReader {
         @Override
         public void run() {
 
-                    Log.sendMessage("Lancement du téléchargement ! " + urlRssReader);
+                    Logs.sendInfo("Lancement du téléchargement ! " + urlRssReader);
 
                     URL url = null;
                     try {
