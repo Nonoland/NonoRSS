@@ -1,5 +1,6 @@
 package fr.nonoland.nonorss.controllers;
 
+import com.sun.deploy.util.StringUtils;
 import fr.nonoland.nonorss.Main;
 import fr.nonoland.nonorss.fx.ArticleTreeItem;
 import fr.nonoland.nonorss.utils.Article;
@@ -51,19 +52,24 @@ public class WindowController {
         articleTreeView.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
+                //Ajout d'un onglet lors d'un double clique sur l'arbre des articles
                 if(event.getClickCount() == 2) {
                     ArticleTreeItem articleTreeItem = (ArticleTreeItem) articleTreeView.getSelectionModel().getSelectedItem();
 
                     WebView articleView = new WebView();
                     articleView.getEngine().load(articleTreeItem.getArticle().getLink());
 
-                    Tab newTab = new Tab(articleTreeItem.getArticle().getName());
-                    newTab.setClosable(true);
+                    /* Réduire le titre de l'article pour l'onglet */
+                    String articleTitle = articleTreeItem.getArticle().getName();
+                    if(articleTitle.length() > 50) {
+                        articleTitle = articleTitle.substring(0, 50) + "...";
+                    }
 
+                    Tab newTab = new Tab(articleTitle);
+                    newTab.setClosable(true);
                     newTab.setContent(articleView);
 
                     tabPane.getSelectionModel().select(newTab);
-
                     tabPane.getTabs().add(newTab);
 
                     main.getLocalSave().addURLInHistory(articleTreeItem.getArticle());

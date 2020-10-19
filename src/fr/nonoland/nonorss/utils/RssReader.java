@@ -4,7 +4,6 @@ import fr.nonoland.nonorss.Main;
 import fr.nonoland.nonorss.utils.log.Log;
 import fr.nonoland.nonorss.utils.log.StatusCode;
 import javafx.application.Platform;
-import javafx.concurrent.Task;
 import javafx.scene.image.Image;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -26,11 +25,10 @@ import java.util.Date;
 
 public class RssReader {
 
-    private String urlRssReader;
+    private final String urlRssReader;
 
     /* XML File */
     private String xmlFile;
-    private DocumentBuilderFactory dbFactory;
     private DocumentBuilder dBuilder;
     private Document document;
 
@@ -77,7 +75,7 @@ public class RssReader {
     public void readXML() {
         if(downloadGood) {
 
-            this.dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             try {
                 this.dBuilder = dbFactory.newDocumentBuilder();
             } catch (ParserConfigurationException e) {

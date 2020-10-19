@@ -17,13 +17,14 @@ import java.util.ArrayList;
 
 public class Main extends Application {
 
-    /*
+    /* Style
     TODO Ajout de l'article déjà lu (Juste changer le style)
+    TODO Réduire le titre de l'article dans les onglets
      */
 
     private LocalSave localSave;
 
-    private ArrayList<RssReader> fluxRss = new ArrayList<RssReader>();
+    private ArrayList<RssReader> fluxRss = new ArrayList<>();
 
     /* Controllers */
     public WindowController ControllerWindow;
