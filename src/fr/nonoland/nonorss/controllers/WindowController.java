@@ -3,8 +3,10 @@ package fr.nonoland.nonorss.controllers;
 import fr.nonoland.nonorss.Main;
 import fr.nonoland.nonorss.fx.ArticleTreeItem;
 import fr.nonoland.nonorss.utils.Article;
+import fr.nonoland.nonorss.utils.LocalSave;
 import fr.nonoland.nonorss.utils.RssReader;
 import fr.nonoland.nonoutils.logs.Logs;
+import javafx.css.PseudoClass;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -40,12 +42,42 @@ public class WindowController {
 
     private Main main;
 
+    private TreeItem treeItemRoot;
+
     @FXML
     private void initialize() {
+        /* Ajoute la possibilité de fermer les onglets */
         tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.ALL_TABS);
 
         tabWelcomeView.setClosable(true);
         welcomeWebView.getEngine().load("http://nolandartois.fr");
+
+        /* Paramètres de la TreeView */
+
+        treeItemRoot = new TreeItem("FluxRSS");
+
+        articleTreeView.setRoot(treeItemRoot);
+        articleTreeView.setShowRoot(false);
+
+        /* TreeView style */
+
+
+        /* TreeView events */
+        articleTreeView.setCellFactory(tv -> new TreeCell<String>(){
+            @Override
+            public void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                pseudoClassStateChanged(PseudoClass.getPseudoClass("articleSeen"), false);
+                setText(item);
+                if(getTreeItem() instanceof ArticleTreeItem) {
+                    ArticleTreeItem articleTreeItem = (ArticleTreeItem) getTreeItem();
+                    if(LocalSave.ifArticleAlreadySeen(articleTreeItem.getArticle())) {
+                        setText(item);
+                        pseudoClassStateChanged(PseudoClass.getPseudoClass("articleSeen"), true);
+                    }
+                }
+            }
+        });
 
         articleTreeView.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
@@ -75,8 +107,6 @@ public class WindowController {
                 }
             }
         });
-
-
     }
 
     public void setMain(Main main) {
@@ -109,8 +139,8 @@ public class WindowController {
     @FXML
     public void updateRSS() {
         Logs.sendWarning("Mise à jour de la liste des flux...");
-
-        TreeItem rootItem = new TreeItem("FluxRSS");
+        /* Vide le treeItemRoot */
+        treeItemRoot.getChildren().clear();
 
         for(RssReader rss : main.getFluxRss()) {
 
@@ -120,15 +150,11 @@ public class WindowController {
 
             for(Article article : rss.getArticles()) {
                 ArticleTreeItem articleItem = new ArticleTreeItem(article);
-
                 flux.getChildren().add(articleItem);
             }
 
-            rootItem.getChildren().add(flux);
+            treeItemRoot.getChildren().add(flux);
         }
-
-        articleTreeView.setRoot(rootItem);
-        articleTreeView.setShowRoot(false);
     }
 
     public void updateProgressBar() {

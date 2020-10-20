@@ -1,17 +1,15 @@
 package fr.nonoland.nonorss.utils;
 
 import fr.nonoland.nonorss.Main;
+import fr.nonoland.nonoutils.hash.Hash;
 import fr.nonoland.nonoutils.logs.Logs;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Properties;
@@ -62,7 +60,6 @@ public class LocalSave {
             rss = new ArrayList<String>();
 
         for(String s : rss) {
-            //RssReader rss = RssReader.getRssReaderWithURL(s);
             RssReader rss = new RssReader(s);
             rss.setMain(main);
             rss.readXML();
@@ -88,7 +85,7 @@ public class LocalSave {
     public void addURLInHistory(Article article) {
 
         /* Create File */
-        Path path = Paths.get(System.getProperty("user.home"), ".nonorss", "history", hash(article.getLink()) + ".hist");
+        Path path = Paths.get(System.getProperty("user.home"), ".nonorss", "history", Hash.hashMD5(article.getLink()) + ".hist");
 
         try {
             Files.createFile(path);
@@ -98,26 +95,9 @@ public class LocalSave {
 
     }
 
-    public boolean ifArticleAlreadySeen(Article article) {
-        Path path = Paths.get(System.getProperty("user.home"), ".nonorss", "history", hash(article.getLink()) + ".hist");
+    public static boolean ifArticleAlreadySeen(Article article) {
+        Path path = Paths.get(System.getProperty("user.home"), ".nonorss", "history", Hash.hashMD5(article.getLink()) + ".hist");
 
         return Files.exists(path);
-    }
-
-    private String hash(String m) {
-        MessageDigest md = null;
-        try {
-            md = MessageDigest.getInstance("MD5");
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-        byte[] messageDigest = md.digest(m.getBytes());
-        BigInteger no = new BigInteger(1, messageDigest);
-        String hashtext = no.toString(16);
-        while(hashtext.length() < 32) {
-            hashtext = "0" + hashtext;
-        }
-
-        return hashtext;
     }
 }

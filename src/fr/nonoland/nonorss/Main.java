@@ -9,6 +9,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -34,6 +35,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         this.primaryStage = primaryStage;
+        this.primaryStage.getIcons().add(new Image(String.valueOf(getClass().getResource("logo.png"))));
 
         localSave = new LocalSave(this);
 
@@ -42,12 +44,11 @@ public class Main extends Application {
         Parent root = loader.load();
         primaryStage.setTitle("NonoRSS");
         primaryStage.setScene(new Scene(root));
+        primaryStage.getScene().getStylesheets().add(String.valueOf(getClass().getResource("stylesheet.css")));
         primaryStage.show();
 
         ControllerWindow = loader.getController();
         ControllerWindow.setMain(this);
-
-        ControllerWindow.updateRSS();
     }
 
     /*

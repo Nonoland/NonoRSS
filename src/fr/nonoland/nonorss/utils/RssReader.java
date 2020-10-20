@@ -74,6 +74,8 @@ public class RssReader {
     public void readXML() {
         if(downloadGood) {
 
+            articles.clear();
+
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             try {
                 this.dBuilder = dbFactory.newDocumentBuilder();

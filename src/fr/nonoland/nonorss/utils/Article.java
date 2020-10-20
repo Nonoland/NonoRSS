@@ -1,15 +1,22 @@
 package fr.nonoland.nonorss.utils;
 
+import fr.nonoland.nonoutils.logs.Logs;
+
 public class Article {
 
     private String title;
     private String link;
     private String description;
 
+
     public Article(String title, String url, String description) {
         this.title = title;
         this.link = url;
         this.description = description;
+
+        /* Seen */
+        /*if(LocalSave.ifArticleAlreadySeen(this))
+            this.title = "[Lu] " + this.title;*/
     }
 
     public String getName() {
