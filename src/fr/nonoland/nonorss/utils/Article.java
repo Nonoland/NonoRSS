@@ -13,10 +13,6 @@ public class Article {
         this.title = title;
         this.link = url;
         this.description = description;
-
-        /* Seen */
-        /*if(LocalSave.ifArticleAlreadySeen(this))
-            this.title = "[Lu] " + this.title;*/
     }
 
     public String getName() {

@@ -110,7 +110,6 @@ public class RssReader {
                     String articleLink = e.getElementsByTagName("link").item(0).getTextContent();
                     String articleDescription = e.getElementsByTagName("description").item(0).getTextContent();
                     this.articles.add(new Article(articleTitle, articleLink, articleDescription));
-                    Logs.sendInfo(articleTitle);
                 }
             }
 
@@ -137,56 +136,36 @@ public class RssReader {
             /* Save optional information */
             if(channel.getElementsByTagName("language").getLength() != 0)
                 this.language = channel.getElementsByTagName("language").item(0).getTextContent();
-            else
-                Logs.sendWarning("La langue n'est pas disponible.");
 
             if(channel.getElementsByTagName("copyright").getLength() != 0)
                 this.copyright = channel.getElementsByTagName("copyright").item(0).getTextContent();
-            else
-                Logs.sendWarning("Le copyright n'est pas disponible.");
 
             if(channel.getElementsByTagName("managingEditor").getLength() != 0)
                 this.managingEditor = channel.getElementsByTagName("managingEditor").item(0).getTextContent();
-            else
-                Logs.sendWarning("L'email managingEditor n'est pas disponible.");
 
             if(channel.getElementsByTagName("webMaster").getLength() != 0)
                 this.webMaster = channel.getElementsByTagName("webMaster").item(0).getTextContent();
-            else
-                Logs.sendWarning("L'email du webMaster n'est pas disponible.");
 
             //TODO Add var with Date later
             if(channel.getElementsByTagName("category").getLength() != 0)
                 this.category = channel.getElementsByTagName("category").item(0).getTextContent();
-            else
-                Logs.sendWarning("La categorie n'est pas disponible.");
 
             if(channel.getElementsByTagName("generator").getLength() != 0)
                 this.generator = channel.getElementsByTagName("generator").item(0).getTextContent();
-            else
-                Logs.sendWarning("Le générateur n'est pas disponible.");
 
             if(channel.getElementsByTagName("docs").getLength() != 0)
                 this.docs = channel.getElementsByTagName("docs").item(0).getTextContent();
-            else
-                Logs.sendWarning("Le docs n'est pas disponible.");
 
             if(channel.getElementsByTagName("cloud").getLength() != 0)
                 this.cloud = channel.getElementsByTagName("cloud").item(0).getTextContent();
-            else
-                Logs.sendWarning("Le cloud n'est pas disponible.");
 
             if(channel.getElementsByTagName("ttl").getLength() != 0)
                 this.ttl = Integer.parseInt(channel.getElementsByTagName("ttl").item(0).getTextContent());
-            else
-                Logs.sendWarning("Le ttl n'est pas disponible.");
 
             //TODO Add image later
 
             if(channel.getElementsByTagName("textInput").getLength() != 0)
                 this.textInput = channel.getElementsByTagName("textInput").item(0).getTextContent();
-            else
-                Logs.sendWarning("Le textInput n'est pas disponible.");
 
             //TODO Add skipHours and Days later
 

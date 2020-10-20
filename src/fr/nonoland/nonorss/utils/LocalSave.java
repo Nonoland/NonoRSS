@@ -83,16 +83,16 @@ public class LocalSave {
     }
 
     public void addURLInHistory(Article article) {
-
         /* Create File */
         Path path = Paths.get(System.getProperty("user.home"), ".nonorss", "history", Hash.hashMD5(article.getLink()) + ".hist");
 
-        try {
-            Files.createFile(path);
-        } catch (IOException e) {
-            e.printStackTrace();
+        if(!Files.exists(path)) {
+            try {
+                Files.createFile(path);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
-
     }
 
     public static boolean ifArticleAlreadySeen(Article article) {
